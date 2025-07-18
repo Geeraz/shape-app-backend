@@ -1,0 +1,35 @@
+{
+	"name": "shape-app-backend",
+	"version": "1.0.0",
+	"description": "",
+	"main": "src/server.js",
+	"type": "module",
+	"scripts": {
+		"build": "tsc",
+		"start": "npm run build && node src/server.js",
+		"dev": "nodemon --watch \"src/**/*.ts\" --exec \"tsx watch src/server.ts\""
+	},
+	"dependencies": {
+		"@better-auth/expo": "^1.2.12",
+		"better-auth": "^1.2.12",
+		"cors": "^2.8.5",
+		"dotenv": "^17.2.0",
+		"drizzle-orm": "^0.44.3",
+		"express": "^5.1.0",
+		"jose": "^3.20.4",
+		"pg": "^8.16.3"
+	},
+	"devDependencies": {
+		"@types/cors": "^2.8.19",
+		"@types/express": "^5.0.3",
+		"@types/node": "^24.0.14",
+		"@types/pg": "^8.15.4",
+		"drizzle-kit": "^0.31.4",
+		"nodemon": "^3.1.10",
+		"ts-node": "^10.9.2",
+		"ts-node-dev": "^2.0.0",
+		"tsconfig-paths": "^4.2.0",
+		"tsx": "^4.20.3",
+		"typescript": "^5.8.3"
+	}
+}

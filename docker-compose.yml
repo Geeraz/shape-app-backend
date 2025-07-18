@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: shapeapp_db
+    environment:
+      POSTGRES_USER: shapeapp_user
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: shapeapp
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  backend:
+    build: .
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://shapeapp_user:password123@db:5432/shapeapp
+      SCHEME: shapeapp
+      EXPO_BASE_URL: http://localhost:8081
+    volumes:
+      # 1) mount your entire project
+      - ./:/app
+      # 2) keep the container’s node_modules intact
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    command: npm run dev
+
+volumes:
+  pgdata:
