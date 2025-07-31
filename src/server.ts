@@ -2,10 +2,13 @@ import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
 import type { NextFunction, Request, Response } from "express";
 import express from "express";
+import swaggerUi from "swagger-ui-express";
 import { ZodError } from "zod";
 import { auth } from "./lib/auth";
 // --> Local Imports
 import { env } from "./lib/env"; // Use the validated environment variables
+// Import the OpenAPI document you created
+import { openApiDocument } from "./lib/openapi-spec";
 import apiRouter from "./routes"; // Your main application router
 
 // --- 1. App Initialization ---
@@ -32,6 +35,12 @@ if (env.NODE_ENV === "development") {
 app.all("/api/auth/*splat", toNodeHandler(auth));
 // Parse incoming JSON request bodies
 app.use(express.json());
+
+app.get("/openapi.json", (_, res) => {
+	res.json(openApiDocument);
+});
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 // --- 3. Application Routes ---
 // Mount all your API routes under the /api prefix.

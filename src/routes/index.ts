@@ -6,7 +6,7 @@ import userRouter from "./user.routes";
 const router = Router();
 
 router.use("/auth", authRouter);
-router.use("/log", logRouter);
+router.use("/logs", logRouter);
 router.use("/user", userRouter);
 
 export default router;

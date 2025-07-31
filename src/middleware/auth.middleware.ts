@@ -16,11 +16,9 @@ export const requireAuth = async (
 		const session = await auth.api.getSession({
 			headers: fromNodeHeaders(req.headers),
 		});
-		console.log(req.headers);
 		if (!session?.user) {
 			return res.status(401).json({ error: "Unauthorized: No active session" });
 		}
-
 		// Attach the user object to the request
 		req.user = session.user;
 
