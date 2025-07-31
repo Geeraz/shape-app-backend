@@ -1,12 +1,13 @@
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { database } from "../db";
+import { db } from "@/db";
+import { env } from "./env";
 
 export const auth = betterAuth({
-	trustedOrigins: ["shapeapp://"],
-	database: drizzleAdapter(database, {
-		provider: "pg", // or "mysql", "sqlite"
+	trustedOrigins: [env.AUTH_TRUST_ORIGIN],
+	database: drizzleAdapter(db, {
+		provider: "pg",
 	}),
 	emailAndPassword: {
 		enabled: true,

@@ -1,47 +1,75 @@
-import { fromNodeHeaders, toNodeHandler } from "better-auth/node";
+import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
+import type { NextFunction, Request, Response } from "express";
 import express from "express";
+import { ZodError } from "zod";
 import { auth } from "./lib/auth";
+// --> Local Imports
+import { env } from "./lib/env"; // Use the validated environment variables
+import apiRouter from "./routes"; // Your main application router
 
+// --- 1. App Initialization ---
 const app = express();
-const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+const port = env.PORT; // Use the safe, validated port from your env file
 
-// ─── CORS ────────────────────────────────────────────────────────────────
+// Enable CORS with validated origins
 app.use(
 	cors({
-		origin: [process.env.EXPO_BASE_URL || "http://192.168.2.2:19000"],
+		// Use the validated env var. Add a fallback for flexibility.
+		origin: [env.EXPO_BASE_URL],
 		credentials: true,
-		methods: ["GET", "POST", "PUT", "DELETE"],
 	}),
 );
-
-// Middlware for loging all requests in console
-app.use((req, _, next) => {
-	// console.log(req.headers);
-	console.log(req.method, req.url);
-	next();
-});
-
-// ─── Better Auth handler ───────────────────────────────────────────────────
-// catch-all for /api/auth/*
+if (env.NODE_ENV === "development") {
+	app.use((req: Request, _, next: NextFunction) => {
+		console.log(
+			`[REQUEST RECEIVED] Method: ${req.method}, URL: ${req.originalUrl}`,
+		);
+		next();
+	});
+}
+// Better auth handler needs to be before any middlware
 app.all("/api/auth/*splat", toNodeHandler(auth));
-
-// ─── JSON parsing for your other routes ───────────────────────────────────
+// Parse incoming JSON request bodies
 app.use(express.json());
 
-// ─── Example protected endpoint ───────────────────────────────────────────
-app.get("/api/me", async (req, res) => {
-	const session = await auth.api.getSession({
-		headers: fromNodeHeaders(req.headers),
-	});
-	if (!session) return res.status(401).json({ error: "Not authenticated" });
-	return res.json({ user: session.user });
-});
-app.get("/api/health", async (_, res) => {
-	return res.json({ status: "ok" });
+// --- 3. Application Routes ---
+// Mount all your API routes under the /api prefix.
+app.use("/api", apiRouter);
+
+// A simple, public health check endpoint.
+app.get("/health", (_, res: Response) => {
+	res.status(200).json({ status: "ok" });
 });
 
-// ─── Start server ─────────────────────────────────────────────────────────
-app.listen(3000, "0.0.0.0", () => {
-	console.log(`🚀 Auth server running on http://localhost:${port}`);
+// --- 4. Global Error Handling Middleware ---
+// This is the CATCH-ALL for errors. It MUST be the last `app.use()` call.
+// It will catch any errors passed to `next()` from your controllers.
+app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
+	console.error(`[GLOBAL ERROR] at ${req.method} ${req.url}:`, err);
+
+	// Handle Zod validation errors specifically
+	if (err instanceof ZodError) {
+		return res.status(400).json({
+			error: "Invalid input provided.",
+			details: err.flatten().fieldErrors,
+		});
+	}
+
+	// You could add more custom error types here
+	// if (err instanceof AuthenticationError) {
+	//   return res.status(401).json({ error: "Not authenticated" });
+	// }
+
+	// Fallback for any other unexpected errors
+	return res.status(500).json({
+		error: "An unexpected internal server error occurred.",
+	});
+});
+
+// --- 5. Start Server ---
+app.listen(port, "0.0.0.0", () => {
+	console.log(
+		`🚀 Server running on http://localhost:${port} in ${env.NODE_ENV} mode`,
+	);
 });

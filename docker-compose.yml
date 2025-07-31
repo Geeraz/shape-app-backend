@@ -15,9 +15,18 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgres://shapeapp_user:password123@db:5432/shapeapp
-      SCHEME: shapeapp
-      EXPO_BASE_URL: http://localhost:8081
+      # CORRECT DATABASE_URL: Use the service name 'db', not 'localhost'
+      DATABASE_URL: "postgres://shapeapp_user:password123@db:5432/shapeapp"
+
+      # Environment variables for better-auth
+      # Use AUTH_URL as the standard. NO trailing slash.
+      AUTH_URL: "http://10.0.2.2:3000"
+      AUTH_SECRET: "jXbEAW3wMq4V3VMMZIyc2DAF33loaqAN" # Use your secret
+      AUTH_TRUST_HOST: "true" # Must be a string "true" for local dev
+
+      # Other variables
+      PORT: "3000"
+      NODE_ENV: "development"
     volumes:
       # 1) mount your entire project
       - ./:/app
