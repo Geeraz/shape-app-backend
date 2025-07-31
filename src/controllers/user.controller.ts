@@ -37,4 +37,17 @@ export const userController = {
 			next(error);
 		}
 	},
+
+	/**
+	 * Resets the onboarding status for the current user.
+	 */
+	async resetOnboarding(req: Request, res: Response, next: NextFunction) {
+		try {
+			// The user's ID is guaranteed by the requireAuth middleware
+			const updatedUser = await userService.resetOnboardingStatus(req.user!.id);
+			res.status(200).json(updatedUser);
+		} catch (error) {
+			next(error);
+		}
+	},
 };

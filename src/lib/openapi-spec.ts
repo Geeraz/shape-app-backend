@@ -109,6 +109,26 @@ export const openApiDocument = createDocument({
 				},
 			},
 		},
+		// In your openapi-spec.ts, inside the `paths` object:
+		"/user/me/reset-onboarding": {
+			put: {
+				summary: "Reset the user's onboarding status",
+				tags: ["User"],
+				description:
+					"Sets the 'onboarded' flag to false, allowing the user to go through the onboarding flow again.",
+				responses: {
+					"200": {
+						description: "Onboarding status reset successfully.",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/UserResponse" },
+							},
+						},
+					},
+					"401": { description: "Unauthorized" },
+				},
+			},
+		},
 		"/logs/food": {
 			post: {
 				summary: "Log a new food item",

@@ -12,5 +12,6 @@ router.get("/me", userController.getMyProfile);
 
 // PUT /api/user/me
 router.put("/me", userController.updateMyProfile);
+router.put("/me/reset-onboarding", userController.resetOnboarding);
 
 export default router;

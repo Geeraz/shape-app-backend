@@ -67,6 +67,22 @@ export const userService = {
 			return updatedUser;
 		});
 	},
+	/**
+	 * Sets the user's 'onboarded' status to false.
+	 *
+	 * @param id - The UUID of the user.
+	 * @returns The updated user object.
+	 */
+	async resetOnboardingStatus(id: string) {
+		// We use the `update` method to change only the 'onboarded' field.
+		const [updatedUser] = await db
+			.update(user)
+			.set({ onboarded: false })
+			.where(eq(user.id, id))
+			.returning(); // Use .returning() to get the updated record back
+
+		return updatedUser;
+	},
 
 	/**
 	 * Deletes a user. All related data will be removed due to "on cascade" in your schema.

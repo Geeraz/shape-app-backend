@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { env } from "./env";
 
 export const auth = betterAuth({
+	// --- Your existing, working configuration ---
 	trustedOrigins: [env.AUTH_TRUST_ORIGIN],
 	database: drizzleAdapter(db, {
 		provider: "pg",
@@ -12,15 +13,5 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 	},
-	plugins: [expo()],
-	// socialProviders: {
-	// 	github: {
-	// 		clientId: process.env.GITHUB_CLIENT_ID as string,
-	// 		clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
-	// 	},
-	// google: {
-	// 	clientId: process.env.GOOGLE_CLIENT_ID as string,
-	// 	clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-	// },
-	// },
+	plugins: [expo()], // Keep the expo plugin
 });
