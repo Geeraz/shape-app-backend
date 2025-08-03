@@ -25,6 +25,8 @@ export const user = pgTable("user", {
 	activityLevel: varchar("activity_level", { length: 50 })
 		.notNull()
 		.default("sedentary"), // e.g., 'sedentary', 'lightly_active', 'moderately_active', 'very_active'
+
+	startingWeightKg: real("weekly_weight_goal_kg"), // e.g., -0.5 for losing 0.5kg/week
 	weeklyWeightGoalKg: real("weekly_weight_goal_kg").notNull().default(0), // e.g., -0.5 for losing 0.5kg/week
 	targetWeightKg: real("target_weight_kg"),
 

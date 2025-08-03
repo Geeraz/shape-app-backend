@@ -31,6 +31,7 @@ export const zUserUpdate = z.object({
 		.enum(["sedentary", "lightly_active", "moderately_active", "very_active"])
 		.optional(),
 	weeklyWeightGoalKg: z.number().optional(),
+	startWeightKg: z.number().positive().optional().nullable(),
 	targetWeightKg: z.number().positive().optional().nullable(),
 	targetCalories: z.number().int().positive().optional().nullable(),
 	targetProteinG: z.number().int().positive().optional().nullable(),

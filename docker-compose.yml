@@ -11,7 +11,11 @@ services:
     ports:
       - "5432:5432"
   backend:
-    build: .
+    build:
+      # context: tells Docker "look for source files in the project root"
+      context: .
+      # dockerfile: tells Docker "use the Dockerfile at this specific path"
+      dockerfile: ./Docker/node/Dockerfile
     depends_on:
       - db
     environment:
@@ -36,5 +40,51 @@ services:
       - "3000:3000"
     command: npm run dev
 
+  n8n:
+    image: n8nio/n8n:latest
+    build:
+      context: .
+      dockerfile: ./Docker/n8n/Dockerfile
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    depends_on:
+      - n8n_db
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=n8n_db
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=n8n_user
+      - DB_POSTGRESDB_PASSWORD=n8n_pass
+      - NODE_FUNCTION_ALLOW_EXTERNAL=sharp
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=secret
+      - GENERIC_TIMEZONE=Europe/Sarajevo
+      - NODE_ENV=development
+    volumes:
+      - n8n-data:/home/node/.n8n
+    networks:
+      - backend_network
+
+  n8n_db:                                 
+    image: postgres:15-alpine             
+    container_name: n8n_db
+    environment:
+      POSTGRES_USER: n8n_user
+      POSTGRES_PASSWORD: n8n_pass
+      POSTGRES_DB: n8n                    
+    volumes:
+      - n8n_pgdata:/var/lib/postgresql/data
+    networks:
+      - backend_network
 volumes:
   pgdata:
+  n8n-data:
+  n8n_pgdata:
+
+networks:
+  backend_network:
+    driver: bridge

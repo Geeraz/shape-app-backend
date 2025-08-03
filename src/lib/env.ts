@@ -16,6 +16,7 @@ const envSchema = z.object({
 	BETTER_AUTH_SECRET: z.string(),
 	AUTH_TRUST_HOST: z.string().optional().default("true"), // Should be true for dev
 	AUTH_TRUST_ORIGIN: z.string(),
+	OPENROUTER_API_KEY: z.string(),
 });
 
 export const env = envSchema.parse(process.env);
